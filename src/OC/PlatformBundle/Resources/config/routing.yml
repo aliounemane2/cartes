@@ -1,0 +1,53 @@
+oc_platform_homepage:
+    path:     /hello/{name}
+    defaults: { _controller: OCPlatformBundle:Default:index }
+
+oc_platform_carte:
+    path:     /carte
+    defaults: { _controller: OCPlatformBundle:Default:carte }
+
+oc_platform_limitezone:
+    path:     /limitezone
+    defaults: { _controller: OCPlatformBundle:Default:limitezone }
+    requirements:
+        _method:  POST
+
+oc_platform_categoriePlaces:
+    path:     /categoriePlaces
+    defaults: { _controller: OCPlatformBundle:Default:categoriePlaces }
+    requirements:
+       _method:  POST
+
+oc_platform_markeur:
+    path:     /addMarkeur
+    defaults: { _controller: OCPlatformBundle:Default:addMarkeur }
+
+oc_platform_categorie:
+    path:     /categorie
+    defaults: { _controller: OCPlatformBundle:Default:addCategorie }
+
+oc_platform_commercial:
+    path:     /addCommercial
+    defaults: { _controller: OCPlatformBundle:Default:addCommercial }
+
+oc_platform_formulaireComplet:
+    path:     /formulaireComplet
+    defaults: { _controller: OCPlatformBundle:Default:formulaireComplet }
+
+oc_platform_aff_commercial:
+    path:     /aff_Commercial
+    defaults: { _controller: OCPlatformBundle:Default:aff_Commercial }
+    requirements:
+       _method:  POST
+
+oc_platform_aff_evenement:
+    path:     /aff_Evenement
+    defaults: { _controller: OCPlatformBundle:Default:aff_Evenement }
+    requirements:
+       _method:  POST|GET
+
+oc_platform_aff_eventcommercial:
+    path:     /aff_Eventcommercial
+    defaults: { _controller: OCPlatformBundle:Default:aff_Eventcommercial }
+    requirements:
+       _method:  GET

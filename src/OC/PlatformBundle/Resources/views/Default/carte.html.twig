@@ -1,0 +1,1507 @@
+<!DOCTYPE html>
+<html>
+	<head> 
+		<title> Géolocalisation </title>
+		<meta charset="UTF-8"/>
+		<link rel="StyleSheet" href="{{ asset('bundles/ocplatform/css/bootstrap.css') }}" />
+		<link rel="StyleSheet" href="{{ asset('bundles/ocplatform/js/bootstrap.js') }}" />
+		
+		<style>
+
+		html, body, #map-canvas {
+			height: 100%;
+			margin: 0px;
+			padding: 0px
+		}
+		
+		.formulaire{
+			text-align : center;
+			width : 30%;
+			margin : 0 auto;
+			padding : 2px 5px 2px 1px;
+			visibility : hidden;
+			border : 2px solid #eee;
+			border-radius: 10px;
+			background-color:green;
+			position:absolute;
+			top:0;
+			left:30%;
+			//display:none;	
+		}
+
+        .places{
+
+            text-align: center;
+            margin: 0 auto;
+            position: absolute;
+            visibility: hidden;
+            top:0;
+            background-color: #008000;
+            width:40%;
+            padding: 0;
+            margin-top: 2%;
+            left:30%;
+        }
+
+        .bouton_cat{
+
+            text-align:center;
+            position: absolute;
+            top:5%;
+            left: 7%;
+        }
+
+        .bouton_com{
+            text-align: center;
+            position: absolute;
+            top:5%;
+            left: 19%;
+        }
+
+        .btn_form_complet{
+            text-align: center;
+            position: absolute;
+            top:5%;
+            left:32%;
+        }
+
+        #categorie{
+            text-align:center;
+            position: absolute;
+            visibility: hidden;
+            top:0;
+            background-color: #eee;
+            width:30%;
+            padding: 0;
+            margin-top: 4%;
+            left:37%;
+        }
+
+        #commercial{
+            text-align: center;
+            position: absolute;
+            visibility: hidden;
+            width: 25%;
+            margin-top: 4%;
+            padding: 0;
+            left: 37%;
+            top:0;
+            background-color: #eee;
+        }
+
+        #form_complet{
+            text-align: center;
+            position: absolute;
+            visibility: hidden;
+            width: 26%;
+            background-color: #eee;
+            top:0;
+            left:72.5%;
+            padding:0;
+            margin-top: 6%;
+            //height: 80%;
+        }
+
+		.eff{
+			background-color:red;
+			}
+		
+		#titre{
+			color:red;
+		}
+		
+		#btn1{
+			color:green;
+		}
+		
+		#btn2{
+			color:red;
+		}
+				
+		#contenu1{
+			//visibility:hidden;
+			//display:none;
+			//position:absolute;
+		}
+
+        .test{
+            visibility: hidden;
+            background-color: #3e8f3e;
+        }
+
+        .catego{
+            visibility: hidden;
+            background-color: #e38d13;
+        }
+        .test_commercial{
+            visibility: hidden;
+            background-color: #2aabd2;
+        }
+
+        .test_events{
+            visibility: hidden;
+            background-color: #aa200a;
+        }
+        .tite{
+            color: red;
+        }
+
+    </style>
+	
+		<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?libraries=geometry"></script>
+		<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?libraries=drawing"></script>
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+		<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+        <!-- <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false"></script> -->
+        <!-- <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?"></script>-->
+
+		{% block javascripts %}
+				<script type="text/javascript" src="{{ asset('bundles/ocplatform/js/jquery.js') }}"></script>
+				<script type="text/javascript" src="{{ asset('bundles/ocplatform/js/gmap.js') }}"></script>
+		{% endblock %}
+	
+    <script>
+	
+		//var map = null;
+		// Appel de la Fonction Initialize
+		google.maps.event.addDomListener(window, 'load', initialize);
+		
+		// Appel de la fonction Dessiner Histogramme 
+		google.load("visualization", "1", {packages:["corechart"]});
+		google.setOnLoadCallback(drawChart);
+		
+		// Diagramme Circulaire
+		google.setOnLoadCallback(drawChartcir);
+		
+		//Diagramme en Baton
+		google.setOnLoadCallback(drawChartbaton);
+		
+		// Courbe
+		google.setOnLoadCallback(drawChartCourbe);
+		
+		//Diagramme en Baton1
+		google.setOnLoadCallback(drawChartbaton1);
+		
+		// Diagramme en Baton Horizontale
+		google.setOnLoadCallback(drawChartDiagBatonHor);
+				
+		//Diagramme Baton Horizontale
+		 function drawChartDiagBatonHor() {
+			 
+			 var data = google.visualization.arrayToDataTable([
+				["Element", "Density", { role: "style" } ],
+				["Copper", 8.94, "#b87333"],
+				["Silver", 10.49, "silver"],
+				["Gold", 19.30, "gold"],
+				["Platinum", 21.45, "color: #e5e4e2"]
+			]);
+
+			var view = new google.visualization.DataView(data);
+						view.setColumns([0, 1,
+						{ 
+							calc: "stringify",
+							sourceColumn: 1,
+							type: "string",
+							role: "annotation" },
+						2]);
+
+			var options = {
+				title: "Density of Precious Metals, in g/cm^3",
+				width: 390,
+				height: 200,
+				bar: {groupWidth: "95%"},
+				legend: { position: "none" }
+               /* backgroundColor: {
+                    'stroke':'none',
+                    'fill':'none'
+                }*/
+			  };
+			  
+			var chart = new google.visualization.BarChart(document.getElementById("batonhorizontal"));
+			chart.draw(view, options);
+  }
+		
+		//Fonction Diagramme en Baton1
+		function drawChartbaton1() {
+			
+			var data = google.visualization.arrayToDataTable([
+						['Genre', 'Fantasy & Sci Fi', 'Romance', 'Mystery/Crime', 'General',
+						 'Western', 'Literature', { role: 'annotation' } ],
+						['2010', 10, 24, 20, 32, 18, 5, ''],
+						['2020', 16, 22, 23, 30, 16, 9, ''],
+						['2030', 28, 19, 29, 30, 12, 13, '']
+					  ]);
+
+			var options = {
+				width: 390,
+				height: 200,
+				legend: { position: 'top', maxLines: 3 },
+				bar: { groupWidth: '75%' },
+				isStacked: true
+			};
+			
+			var chart = new google.visualization.Histogram(document.getElementById('baton1'));
+			chart.draw(data, options);
+		  }
+
+		// Fonction Courbe
+		function drawChartCourbe() {
+        var data = google.visualization.arrayToDataTable([
+          ['Year', 'Sales', 'Expenses'],
+          ['2004',  1000,      400],
+          ['2005',  1170,      460],
+          ['2006',  660,       1120],
+          ['2007',  1030,      540]
+        ]);
+
+        var options = {
+          title: 'Company Performance',
+          curveType: 'function',
+          legend: { position: 'bottom' }
+        };
+
+        var chart = new google.visualization.LineChart(document.getElementById('courbe'));
+        chart.draw(data, options);
+      }
+		
+		//Diagramme en baton
+		  function drawChartbaton() {
+			
+			var data = google.visualization.arrayToDataTable([
+				['Quarks', 'Leptons', 'Gauge Bosons', 'Scalar Bosons'],
+				[2/3, -1, 0, 0],
+				[2/3, -1, 0, null],
+				[2/3, -1, 0, null],
+				[-1/3, 0, 1, null],
+				[-1/3, 0, -1, null],
+				[-1/3, 0, null, null],
+				[-1/3, 0, null, null]
+			]);
+
+		  var options = {
+			title: 'Charges of subatomic particles',
+			legend: { position: 'top', maxLines: 2 },
+			colors: ['#5C3292', '#1A8763', '#871B47', '#999999'],
+			interpolateNulls: false
+		  };
+			var chart = new google.visualization.Histogram(document.getElementById('baton'));
+			chart.draw(data, options);
+		  }
+
+		  function drawChartcir() {
+
+			var data = google.visualization.arrayToDataTable([
+			  ['Task', 'Hours per Day'],
+			  ['Work',     11],
+			  ['Eat',      2],
+			  ['Commute',  2],
+			  ['Watch TV', 2],
+			  ['Sleep',    7]
+			]);
+
+			var options = {
+			  title: 'Diagramme Circulaire'
+			};
+
+			var chart = new google.visualization.PieChart(document.getElementById('circulaire'));
+
+			chart.draw(data, options);
+		  }
+				
+		// Début de la Fonction Dessiner Histogramme 
+		function drawChart(){
+			
+			var data = google.visualization.arrayToDataTable([
+			  ['Dinosaur', 'Taille'],
+			  ['Acrocanthosaurus (top-spined lizard)', 12.2],
+			  ['Albertosaurus (Alberta lizard)', 9.1],
+			  ['Allosaurus (other lizard)', 12.2],
+			  ['Apatosaurus (deceptive lizard)', 22.9],
+			  ['Archaeopteryx (ancient wing)', 0.9],
+			  ['Argentinosaurus (Argentina lizard)', 36.6],
+			  ['Baryonyx (heavy claws)', 9.1],
+			  ['Brachiosaurus (arm lizard)', 30.5],
+			  ['Ceratosaurus (horned lizard)', 6.1],
+			  ['Coelophysis (hollow form)', 2.7],
+			  ['Compsognathus (elegant jaw)', 0.9],
+			  ['Deinonychus (terrible claw)', 2.7],
+			  ['Diplodocus (double beam)', 27.1],
+			  ['Dromicelomimus (emu mimic)', 3.4],
+			  ['Gallimimus (fowl mimic)', 5.5],
+			  ['Mamenchisaurus (Mamenchi lizard)', 21.0],
+			  ['Megalosaurus (big lizard)', 7.9],
+			  ['Microvenator (small hunter)', 1.2],
+			  ['Ornithomimus (bird mimic)', 4.6],
+			  ['Oviraptor (egg robber)', 1.5],
+			  ['Plateosaurus (flat lizard)', 7.9],
+			  ['Sauronithoides (narrow-clawed lizard)', 2.0],
+			  ['Seismosaurus (tremor lizard)', 45.7],
+			  ['Spinosaurus (spiny lizard)', 12.2],
+			  ['Supersaurus (super lizard)', 30.5],
+			  ['Tyrannosaurus (tyrant lizard)', 15.2],
+			  ['Ultrasaurus (ultra lizard)', 30.5],
+			  ['Velociraptor (swift robber)', 1.8]  
+			]);
+
+			var options = {
+				  title: ' L \' Histogramme de la Zone : ',
+				  legend: { position: 'none' }
+			};
+	
+			var chart = new google.visualization.Histogram(document.getElementById('histog'));
+			chart.draw(data, options);
+			
+	  }
+	// Fin Dessiner Histogramme
+
+     // Afficher Markeur Commercial
+        function markeurCommercial(){
+
+            // Markeur
+            var contentString =
+                    '<div id="content">'+
+                    '<div id="siteNotice">'+
+                    '</div>'+
+                    '<h6 id="firstHeading" class="firstHeading"> Commercial </h6>'+
+                    '</div>';
+
+            var infowindow = new google.maps.InfoWindow({
+                content: contentString
+            });
+
+            marker = new google.maps.Marker({
+                position: new google.maps.LatLng(14.734854, -17.479183),
+                map: map,
+                draggable:true,
+                title: " Commercial "
+            });
+
+            google.maps.event.addListener(marker, 'mouseup', function() {
+                infowindow.open(map,marker);
+
+                console.log(marker);
+                mac = marker.getPosition();
+                console.log(mac);
+                pos = mac.G+","+mac.K;
+
+                posi = pos;
+                console.log(" ### La Position du Marqueur est : ###");
+                console.log(posi);
+
+            });
+        }
+
+        // Partie Evenement
+        function evenement(evenement) {
+
+            console.log(evenement);
+            $("#test_events input[type='checkbox']").on("click", function () {
+                if ($(this).is(':checked')) {
+
+                    $.ajax({
+                        url: "{{ path('oc_platform_aff_evenement') }}",
+                        type: 'POST',
+                        data: {
+                            'id':evenement
+                        },
+                        success: function (json) {
+                                alert(' SUCCESS ');
+                        }, error: function (json) {
+                            alert(' Error ' + json);
+                        },
+                        complete: function (json) {
+                            //alert(' Complete ' + json);
+                        }
+                    });
+                }
+            });
+        }
+
+
+	// Partie Limite Zone
+     function limiteZone(limitezone){
+
+         console.log(limitezone);
+         $("#test input[type='checkbox']").on("click",function() {
+             if ($(this).is(':checked')) {
+
+                 $.ajax({
+
+                     url : "{{  path('oc_platform_limitezone') }}",
+                     type : 'POST',
+                     data : { 'id': limitezone },
+                     success : function(json){
+                         var triangleCoords = [];
+                         $.each(json,function(){
+                             console.log(this.latitude+","+this.longitude);
+                             triangleCoords.push(new google.maps.LatLng(this.latitude, this.longitude));
+                             // Construct the polygon.
+                             bermudaTriangle = new google.maps.Polygon({
+                                 paths: triangleCoords,
+                                 strokeColor: '#FF0000',
+                                 strokeOpacity: 0.8,
+                                 strokeWeight: 2,
+                                 fillColor: '#FF0000',
+                                 fillOpacity: 0.35
+                             });
+                             console.log("### map ####");
+                             console.log(map);
+
+                             bermudaTriangle.setMap(map);
+                         });
+                     },
+                     error : function(json){
+                         alert('Error'+json);
+                     },
+                     complete : function(json){
+                         //alert('complete'+json);
+                     }
+                 });
+             }else{
+                  bermudaTriangle.setMap(null);
+             }
+         });
+        }
+
+        // Partie Commercial
+        function AfficherCommercial(id_commercial){
+            console.log(id_commercial);
+            $("#test_commercial input[type='checkbox']").on("click",function(){
+                if ($(this).is(':checked')){
+
+                    $.ajax({
+                        url: "{{ path('oc_platform_aff_commercial') }}",
+                        type: 'POST',
+                        data: {
+                            'id': id_commercial
+                        },
+                        success: function(json){
+                            console.log(" SUCCESS");
+                            // Markeur
+                            var contentString =
+                                    '<div id="content">'+
+                                    '<div id="siteNotice">'+
+                                    '</div>'+
+                                    '<h6 id="firstHeading" class="firstHeading"> Commercial </h6>'+
+                                    '</div>';
+
+                            var infowindow = new google.maps.InfoWindow({
+                                content: contentString
+                                //content: contentString
+                            });
+
+                            marker = new google.maps.Marker({
+                                position: new google.maps.LatLng(14.734854, -17.479183),
+                                map: map,
+                                draggable:true,
+                                title: " Commercial "
+                            });
+
+                            google.maps.event.addListener(marker, 'mouseup', function() {
+                                //infowindow.open(map,marker);
+
+                                console.log(marker);
+                                mac = marker.getPosition();
+                                console.log(mac);
+                                pos = mac.lat()+","+mac.lng();
+
+                                posi = pos;
+                                console.log(" ### La Position du Marqueur est : ###");
+                                console.log(posi);
+                            });
+                        },
+                        error: function (json) {
+                            //alert('Error' + json);
+                        },
+                        complete: function (json) {
+
+                        }
+                    });
+                } else {
+                    marker.setMap(null);
+                }
+            });
+        }
+
+
+        // Partie CatégoriePlaces
+		function categoriePlaces(catPlace){
+            console.log(catPlace);
+            $(".catego input[type='checkbox']").on("click",function() {
+                if ($(this).is(':checked')) {
+
+                    $.ajax({
+                        url: "{{  path('oc_platform_categoriePlaces') }}",
+                        type: 'POST',
+                        data: {
+                            'id': catPlace
+                            //'nomp':ce
+                        },
+                        success: function (json) {
+                            var triangleCoords = [];
+                            $.each(json, function () {
+                                console.log(this.latitude + "," + this.longitude);
+
+                                // Construct Marker
+                                marker = new google.maps.Marker({
+                                    position: new google.maps.LatLng(this.latitude, this.longitude),
+                                    map: map
+                                });
+
+                                console.log("### map ####");
+                                console.log(map);
+
+                                marker.setMap(map);
+                            });
+                        },
+                        error: function (json) {
+                            alert('Error' + json);
+                        },
+                        complete: function (json) {
+                            //alert('complete'+json);
+                        }
+                    });
+
+                } else {
+                    marker.setMap(null);
+                }
+            });
+		}
+
+            function initialize() {
+
+                var tolerance = 0.0001;
+                var point = new google.maps.LatLng(14.734749, -17.472845);
+                var mapOptions = {
+                    center: point,
+                    zoom: 17
+                };
+
+                map = new google.maps.Map(document.getElementById('map-canvas'),
+                        mapOptions);
+
+                // Chargement des évenements
+                $(document).ready(function () {
+                    $.ajax({
+                        url: "{{ path('oc_platform_aff_evenement') }}",
+                        type: "GET",
+                        success : function(json){
+                            console.log(json);
+                            $.each(json,function(){
+                                var triangleCoords = [];
+                                bermudaTriangle = null;
+
+                                console.log(this);
+                                $.each(this,function(){
+                                    triangleCoords.push(new google.maps.LatLng(this.latitude, this.longitude));
+                                });
+
+                                bermudaTriangle = new google.maps.Polygon({
+                                    paths: triangleCoords,
+                                    strokeColor: '#FF0000',
+                                    strokeOpacity: 0.8,
+                                    strokeWeight: 2,
+                                    fillColor: '#FF0000',
+                                    fillOpacity: 0.35
+                                });
+                                console.log("### map ####");
+                                console.log(map);
+                                bermudaTriangle.setMap(map);
+                            });
+                        },
+                        error : function(json){
+                                alert('Error'+json);
+                        },
+                        complete : function(json){
+
+                        }
+                        });
+                        // Fin de l'ajax
+
+                    // Afficher le marker
+                    $.ajax({
+                        url: "{{ path('oc_platform_aff_eventcommercial') }}",
+                        type: "GET",
+                        success : function(json) {
+                            console.log(" ### le marker0 ###");
+                            console.log(json);
+
+                            $.each(json, function(){
+                                console.log(" ### le marker1 ###");
+                                console.log(json);
+                            });
+                        },
+                        error: function(json){
+                            console.log("ERROR "+json);
+                        },
+                        complete: function(json){
+                            console.log("COMPLETE"+json);
+                        }
+                    });
+
+                    var marker = new google.maps.Marker({
+                        position: new google.maps.LatLng(14.734854, -17.479183),
+                        map: map,
+                        draggable:true,
+                        title: " Markeur "
+                    });
+
+                    // Message à afficher dans la zone
+                    google.maps.event.addListener(marker, 'mouseup', function(){
+
+                        console.log(marker);
+                        mac = marker.getPosition();
+                        console.log(mac);
+                        pos = mac.lat() + "," + mac.lng();
+
+                        posi = pos;
+                        console.log(" ### La Position du Marqueur 1 est ###");
+                        console.log(posi);
+
+                        if(bermudaTriangle.containsLatLng(marker.getPosition())){
+                            alert(" Le Markeur est dans le Polygone ");
+                        }
+
+                        if(!bermudaTriangle.containsLatLng(marker.getPosition())){
+                            alert(" Le Markeur n'est pas dans le Polygone");
+                        }
+                    });
+                });
+                // Fin de l'évenement
+
+                var drawingManager = new google.maps.drawing.DrawingManager({
+                    drawingMode: google.maps.drawing.OverlayType.MARKER,
+                    drawingControl: true,
+                    drawingControlOptions: {
+                        position: google.maps.ControlPosition.TOP_CENTER,
+                        drawingModes: [
+                            google.maps.drawing.OverlayType.MARKER,
+                            google.maps.drawing.OverlayType.CIRCLE,
+                            google.maps.drawing.OverlayType.POLYGON,
+                            google.maps.drawing.OverlayType.POLYLINE,
+                            google.maps.drawing.OverlayType.RECTANGLE
+                        ]
+                    },
+                    markerOptions: {
+                        //  icon: 'images/beachflag.png'
+                    },
+                    circleOptions: {
+                        fillColor: '#ffff00',
+                        fillOpacity: 1,
+                        strokeWeight: 5,
+                        clickable: false,
+                        editable: true,
+                        zIndex: 20
+                    }
+                });
+
+                drawingManager.setMap(map);
+
+                google.maps.event.addListener(drawingManager, 'polygoncomplete', function (polygon) {
+                    console.log(polygon);
+                    polygon.setMap(null);
+
+                    $("#formulaire").css("visibility", "visible");
+                    $('#formulaire').show();
+
+                    console.log(polygon.getPath().getArray());
+
+                    tableau = polygon.getPath().getArray();
+                    strzonelimites = "";
+
+                    for (var i = 0; i < tableau.length; i++) {
+                        var ele = tableau[i];
+
+                        if (strzonelimites != "")
+                            strzonelimites += "###";
+
+                        strzonelimites += ele.lat() + "_" + ele.lng();
+
+                    }
+                    var chaine = strzonelimites;
+
+                    console.log('### Le tableau concaténé ###');
+                    console.log(strzonelimites);
+
+                    $('#strzonelimites').val(strzonelimites);
+                });
+
+                google.maps.event.addListener(drawingManager, 'markercomplete', function (marker) {
+                    console.log('### té la ###');
+                    console.log(marker.getPosition());
+
+                    $("#places").css("visibility", "visible");
+                    $('#places').show();
+
+                    tableau = marker.getPosition();
+                    strCategoriePlaces = "";
+
+                    //strCategoriePlaces = tableau.G + "_" + tableau.K;
+					strCategoriePlaces = tableau.lat() + "_" + tableau.lng()
+
+					console.log(tableau)
+                    var chaine = strCategoriePlaces;
+
+                    console.log('### Le tableau concaténé ###');
+                    console.log(chaine);
+
+                    $('#strCategoriePlaces').val(strCategoriePlaces);
+
+                });
+
+                google.maps.event.addListener(drawingManager, 'rectanglecomplete', function (zone) {
+                    $("#formulaire").css("visibility", "visible");
+                    //console.log(zone);
+                });
+
+                google.maps.event.addListener(drawingManager, 'circlecomplete', function (circle) {
+                    $("#formulaire").css("visibility", "visible");
+                    //console.log(circle.getRadius());
+                });
+
+                google.maps.event.addListener(map, 'zoom_changed', function () {
+
+                    var zoom = map.getZoom();
+
+                    if (zoom >= 1 && zoom <= 9) {
+                        //alert(' Je suis entre 1 à 9 ');
+                        //$('#histog').width('50px');
+                        //$('#histog').height('50px');
+                    } else if (zoom > 9 && zoom <= 11) {
+                        //alert('Je suis entre 9 à 11 ');
+                    } else if (zoom > 11) {
+                        //alert('Je suis supérieure à 11');
+                        $('#histog').css({
+                            width: '100%',
+                            height: '100%'
+                        });
+                    }
+                    //alert('Current Zoom is '+map.getZoom());
+                });
+            }
+
+        /* Bouton pour afficher la liste de la zone */
+        $(document).ready(function(){
+            $('.catego').hide();
+            $('#btn-categorie').click( function(){
+                if($('.catego').is(':hidden')){
+
+                    $('.catego').slideDown();
+                    $('.catego').css("visibility","visible");
+                    //alert(' visible ');
+
+                }else if($('.catego').is(':visible')){
+                    $('.catego').slideUp();
+                    $('.catego').css("visibility","hide");
+                    //alert(' Caché ');
+                }
+            });
+        });
+
+
+        /* Bouton pour afficher la liste des commercials */
+        $(document).ready(function(){
+            $('.test_commercial').hide();
+
+            $('#aff_bouton_com').click( function(){
+                if($('.test_commercial').is(':hidden')){
+
+                    $('.test_commercial').slideDown();
+                    $('.test_commercial').css("visibility","visible");
+                    //alert(' visible ');
+                }else if($('.test_commercial').is(':visible')){
+                    $('.test_commercial').slideUp();
+                    $('.test_commercial').css("visibility","hide");
+                    //alert(' Caché ');
+                }
+            });
+        });
+
+
+        /* Bouton pour afficher la liste des Evenements  */
+
+        $(document).ready(function(){
+            $('.test_events').hide();
+
+            $('#aff_bouton_events').click( function(){
+                if($('.test_events').is(':hidden')){
+
+                    $('.test_events').slideDown();
+                    $('.test_events').css("visibility","visible");
+                    //alert(' visible ');
+                }else if($('.test_events').is(':visible')){
+                    $('.test_events').slideUp();
+                    $('.test_events').css("visibility","hide");
+
+                    //alert(' Caché ');
+                }
+            });
+        });
+
+
+        /* Bouton pour afficher la liste de la zone */
+        $(document).ready(function(){
+            $('.test').hide();
+            $('#btn-zone').click( function(){
+               if($('.test').is(':hidden')){
+
+                    $('.test').slideDown();
+                    $('.test').css("visibility","visible");
+                    //alert(' visible ');
+
+               }else if($('.test').is(':visible')){
+                   $('.test').slideUp();
+                   $('.test').css("visibility","hide");
+                   //alert(' Caché ');
+               }
+            });
+        });
+
+
+        // Le Bouton de la création de Catégorie
+        $(document).ready(function(){
+           $(".bouton_cat").click(function(){
+               $("#categorie").css("visibility","visible");
+               $("#categorie").show();
+
+           });
+        });
+
+        // Le Bouton de la création de Commercial
+        $(document).ready(function(){
+            $(".bouton_com").click(function(){
+               // alert(" zf,vrc");
+                $("#commercial").css("visibility","visible");
+                $("#commercial").show();
+
+            });
+        });
+
+
+        // Le Bouton formulaire Complet
+        $(document).ready(function(){
+            $(".btn_form_complet").click(function(){
+                $("#form_complet").css("visibility","visible");
+                $("#form_complet").show();
+            });
+        });
+
+        // Last Version avec le défilement
+        $(document).ready(function(){
+            $('#contenu1').hide("slow");
+            $('.effet').click(
+                    function(){
+                        if($('#contenu1').is(':hidden')){
+                            $('#contenu1').slideDown("slow");
+                            //$('.effet').scroll("slow");
+                            //$('.effet').css('margin-top','-30%').delay("slow");
+                            $('.effet').animate({
+                                marginTop :"-32.5%"
+                            },"slow");
+
+                        }else{
+                            $('#contenu1').slideUp("slow");
+                            $('.effet').animate({
+                                marginTop :"-6%"
+                            },"slow");
+                        }
+
+                    }
+            );
+        });
+
+
+        // Enregistrer Catégorie
+        $(document).ready(function(){
+            $('#enreg_cat').on('submit',function(e) {
+                e.preventDefault();
+                var nomcat = $('#nomcatego').val();
+                console.log(nomcat);
+                //alert(nomcat);
+
+                $.ajax({
+                    url: "{{  path('oc_platform_categorie') }}",
+                    type: 'POST',
+                    data: { 'nomc':nomcat },
+                    success: function (data) {
+                            $('#nomcatego').val('');
+                    },
+                    error: function(error){
+                        alert(" ERROORRR ");
+                    },
+                    complete: function(data){
+                        $('#categorie').hide();
+                    }
+                });
+            });
+        });
+
+
+        // Enregistrer Commercial
+        $(document).ready(function(){
+            $('#enreg_com').on('submit',function(e) {
+                e.preventDefault();
+                var nomcom = $('#nomcom').val();
+                var prenomcom = $('#prenomcom').val();
+                console.log(nomcom);
+                console.log(prenomcom);
+
+                //alert(nomcat);
+
+                $.ajax({
+                    url: "{{ path('oc_platform_commercial') }}",
+                    type: 'POST',
+                    data: {
+                        'nomcom':nomcom,
+                        'prenomcom':prenomcom
+                    },
+                    success: function (data) {
+                        $('#nomcom').val('');
+                        $('#prenomcom').val('');
+                    },
+                    error: function(error){
+                        alert(" ERROORRR ");
+                    },
+                    complete: function(data){
+                        $('#commercial').hide();
+
+                        var contentString =
+                                '<div id="content">'+
+                                '<div id="siteNotice">'+
+                                '</div>'+
+                                '<h6 id="firstHeading" class="firstHeading"> Commercial </h6>'+
+                                '</div>';
+
+
+                        var infowindow = new google.maps.InfoWindow({
+                            content: contentString
+                        });
+
+                        marker = new google.maps.Marker({
+                            position: new google.maps.LatLng(14.734854, -17.479183),
+                            map: map,
+                            draggable:true,
+                            title: " Commercial "
+                        });
+
+                        google.maps.event.addListener(marker, 'mouseup', function() {
+                            infowindow.open(map,marker);
+
+                            console.log(marker);
+                            mac = marker.getPosition();
+                            console.log(mac);
+                            pos = mac.lat()+","+mac.lng();
+
+                            posi = pos;
+                            console.log(" ### La Position du Marqueur est : ###");
+                            console.log(posi);
+
+                        });
+                    }
+                });
+            });
+        });
+
+
+        // Enregistrer Place
+        $(document).ready(function(){
+            $('#enreg_place').on('submit',function(e) {
+
+                e.preventDefault();
+                var nomplace = $('#nomplace').val();
+                console.log(nomplace);
+                var strCatPla = $('#strCategoriePlaces').val();
+                console.log(strCatPla);
+
+                var lis = $('#listeCategories').val();
+                console.log(lis);
+
+                $.ajax({
+                    url: "{{  path('oc_platform_markeur') }}",
+                    type: 'POST',
+                    data: {'nomp':nomplace,
+                           'strCategoriePlaces':strCatPla,
+                           'listeCategories':lis
+                    },
+                    success: function (data) {
+                        $('#nomplace').val('');
+                    },
+                    error: function(error){
+                        alert(" ERROORRR ");
+                    },
+                    complete: function(data){
+                        $('#places').hide();
+                    }
+                });
+            });
+        });
+
+
+        // Enregistrer Zone
+        $(document).ready(function(){
+            $('#enreg_zone').on('submit',function(e) {
+
+                e.preventDefault();
+
+                var nomz = $('#nomzone').val();
+                console.log(nomz);
+                var strzoLi = $('#strzonelimites').val();
+                console.log(strzoLi);
+
+                $.ajax({
+                    url: "{{ path('oc_platform_carte') }}",
+                    type: 'POST',
+                    data: {'nom':nomz,
+                        'strzonelimites':strzoLi
+                    },
+                    success: function (data) {
+                        $('#nomzone').val('');
+                    },
+                    error: function(error){
+                        alert(" ERROORRR ");
+                    },
+                    complete: function(data){
+                        $('#formulaire').hide();
+                    }
+                });
+            });
+        });
+
+
+        // Enregistrer Formumaire Complet avec AJAX
+       /* $(document).ready(function(){
+
+            //$('#enreg_commercial').on('submit',function(e) {
+
+                  //  e.preventDefault();
+                 //#enreg_commercial
+
+            $("input[type='checkbox']").on("click",function() {
+
+                // if ($(this).is(':checked')) {
+
+                    var event = $("input:checked[name=event]").val();
+                    var zone = $("input:checked[name=zone]").val();
+                    var commercial = $("input:checked[name=commercial]").val();
+
+                    alert(event);
+                    alert(zone);
+                    alert(commercial);
+
+                    console.log(event);
+                    console.log(zone);
+                    console.log(commercial);
+
+
+                    //alert(" Events => est : "+event);
+
+                    $.ajax({
+                         url: "{ path('oc_platform_formulaireComplet') }}",
+                         type: 'POST',
+                         data: { 'event':event,
+                                 'zone':zone,
+                                 'commercial':commercial
+                         },
+                         success: function (data) {
+                            //$('#nomzone').val('');
+                             alert(" SUCCESS");
+                         },
+                         error: function(error){
+                            alert(" ERROORRR ");
+                         },
+                         complete: function(data){
+                            //$('#formulaire').hide();
+                         }
+                     });
+                //}
+            });
+            });
+        //});
+        //});
+*/
+
+        // Géofence marker dans une zone
+      /*  $(document).ready(function(){
+
+            map = new GMaps({
+                el: '#map-canvas',
+                zoom: 17,
+                lat: -14.734749,
+                lng: 17.472845,
+                pancontrol : true
+            });
+
+            /*  polygon = map.drawPolygon({
+             paths: path,
+             strokeColor: '#BBD8E9',
+             strokeOpacity: 1,
+             strokeWeight: 3,
+             fillColor: '#BBD8E9',
+             fillOpacity: 0.6
+             });
+
+
+            map.addMarker({
+                lat: 14.734854,
+                lng: -17.479183,
+                draggable: true,
+                // fences: [polygon],
+                outside: function(marker, fence) {
+                    alert(' Le Marqueur est déplacé ');
+                }
+            });
+        });
+*/
+
+/*
+        // GMAP Géofence
+        $(document).ready(function(){
+
+            map = new GMaps({
+                el: '#map-canvas',
+                zoom: 17,
+                lat: -14.734749,
+                lng: 17.472845,
+                pancontrol: true
+            });
+
+            var path = [
+                [-14.736225210734796,17.47254252433777],
+                [-14.732884134445854,17.475932836532593],
+                [-14.732707740795513,17.46829390525818]
+               // [-14.734749866577001,17.47284522636042]
+            ];
+
+            polygon = map.drawPolygon({
+                paths: path,
+                strokeColor: '#BBD8E9',
+                strokeOpacity: 1,
+                strokeWeight: 3,
+                fillColor: '#BBD8E9',
+                fillOpacity: 0.6
+            });
+
+            map.addMarker({
+                lat: -14.734854,
+                lng: 17.479183,
+                draggable: true,
+               fences: [polygon],
+                outside: function (marker, fence) {
+                    alert('This marker has been moved outside of its fence');
+                }
+
+            });
+        });
+        // Fin Géofence
+*/
+
+    </script>
+	
+	</head>
+	<body>
+
+            <!-- Le contenu du map -->
+			<div id="map-canvas"></div>
+
+            <!-- Formulaire pour les zones -->
+            <div class="formulaire col-lg-4 col-md-3 col-sm-2" id="formulaire">
+			
+				<h3 id="titre"> Que voulez-vous faire ??? </h3>
+					<p> Si vous voulez enregistrer cette zone <br/>
+					 Veuillez remplir le champ de texte puis cliquez sur Enregistrer <br/>
+					 Au cas échéant Cliquez sur Annuler <br/> </p>  
+					 
+					 <form method="POST" id="enreg_zone">
+						<input type="text" name="nom" required autocomplete="off" id="nomzone" /> <br/>
+						<input type="submit" id="btn1" value="Enregistrer" />
+						<input type="reset" name="annuler" id="btn2" value="Annuler" />
+						<input type="hidden" id="strzonelimites" name="strzonelimites" />
+					</form>
+			</div>
+
+
+            <!-- Afficher la zone -->
+            <div style="z-index:100;position:absolute;top:0;left:88%;margin-top:5px;">
+
+                <!-- Boutton afficher la zone -->
+                <button class="btn btn-success btn-zone" id="btn-zone"> Zone </button>
+
+                <div class="test" id="test">
+                    {% for valeur, zone in listeZones %}
+                        <input type="checkbox" value="{{ zone.id }}" class="test1" id="listeZones" onfocus="limiteZone('{{ zone.id }}');"/>
+                        <label> {{ zone.nom }} </label><br/>
+                    {% endfor %}
+                </div>
+            </div>
+
+
+            <div style="position:absolute;top:0;left:75%;margin-top: 5px;">
+                <button class="btn btn-warning" id="btn-categorie"> Catégorie </button>
+
+                <div name="listeCategorie" class="catego">
+                    {% for valeur , categorie in listeCategorie %}
+                        <input type="checkbox" value="{{ categorie.id }}" id="listeCategorie" class="boul" onfocus="categoriePlaces({{ categorie.id }});"/>
+                        <label> {{ categorie.nomc }} </label><br/>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Afficher Commercial  -->
+            <div style="z-index:100;position:absolute;top:0;left:65%;margin-top:5px;">
+
+
+                <!-- Afficher les Commerciaux  -->
+
+                    <button class="btn btn-info aff_bouton_com" id="aff_bouton_com"> Commercial </button>
+
+                <div class="test_commercial" id="test_commercial">
+                    {% for valeur, commercial in listeCommercial %}
+                        <input type="checkbox" value="{{ commercial.id }}" class="test1_commercial" id="listeCommercial" onfocus="AfficherCommercial('{{ commercial.id }}')";/>
+                        <label> {{ commercial.nom }} </label><br/>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Zone -->
+            <div style="z-index:100;position:absolute;top:0;left:58%;margin-top:5px;">
+
+                    <button class="btn btn-danger aff_bouton_events" id="aff_bouton_events"> Events </button>
+
+                    <div class="test_events" id="test_events">
+                        {% for valeur, evenement in listeEvenement %}
+                            <input type="checkbox" value="{{ evenement.id }}"  id="listeEvenement" onfocus="evenement('{{ evenement.id }}');"/>
+                            <label> {{ evenement.event }}  {{ evenement.zone.nom }}  {{ evenement.commercial.nom }} {{ evenement.commercial.prenom }} </label><br/>
+                        {% endfor %}
+                    </div>
+            </div>
+
+          <!--   <div style="z-index:100;position:absolute;top:0;left:88%;margin-top:5px;">
+                <select id="listeZones" name="listeZones" onChange="limiteZone();"> {##} for valeur, zone in listeZones %} <option value="{" zone.id }}"> {##} zone.nom }} </option> {##} endfor %} </select>
+            </div>
+    -->
+
+		
+			<div class="container col-lg-12 col-md-12 col-sm-12">			
+				
+				<div class="row contenu0" id="contenu0">
+
+					<ul class="nav nav-tabs">    
+						<li class="active"><a href="#" data-toggle="tab"> Par Jour </a></li> 
+						<li><a href="#" data-toggle="tab"> Par Mois </a></li>
+						<li><a href="#" data-toggle="tab"> Par Semaine </a></li>    
+						<li><a href="#" data-toggle="tab"> Par An </a></li> 	 
+					</ul> 
+
+					<button class="btn btn-primary effet" id="effet" style="position:absolute;margin-top:-6%;z-index:200;"> Statistiques </button>
+					
+					<div class="tab-content" id="contenu1" style="position:absolute;margin-top:-30%;background-color: #ffffff;">
+						<div id="histog" style="position:absolute;display:none;float:left;height:25%;visibility:hidden;width:33%;"></div>
+						<div id="circulaire" style="float:left;height:25%;top:0;width:33%;"></div>
+						<div id="baton" style="float:left;height:25%;top:0;width:33%;"></div>
+						<div id="courbe" style="float:left;height:25%;top:0;width:33%;"></div>
+						<div id="baton1" style="float:left;height:25%;top:0;width:33%;"></div>
+						<div id="batonhorizontal" style="float:left;height:25%;top:0;width:33%;"></div>
+						
+					</div>
+				</div>	
+			</div>
+
+
+            <!--  Formulaire pour enregistrer une Place  -->
+            <div class="places form-horizontal col-lg-7" id="places">
+                <form method="POST" id="enreg_place">
+
+
+                <div class="row">
+                    <div class="form-group">
+                        <label class="col-lg-3"> Nom de la Catégorie </label>
+                        <div class="col-lg-4">
+                            <select id="listeCategories" class="lisCate" name="listeCategories">
+                                {%  for valeur , categorie in listeCategorie %}
+                                    <option value="{{ categorie.id }}"> {{ categorie.nomc }} </option>
+                                {%  endfor %}
+                            </select>
+                            <input type="hidden" id="category" name="category"/>
+                        </div>
+                    </div>
+                </div>
+
+                    <div class="row">
+                        <div class="form-group">
+                            <label class="col-lg-3"> Nom Place </label>
+                            <div class="col-lg-4">
+                                <input type="text" class="form-control" required name="nomp" id="nomplace" autocomplete="off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group col-lg-7">
+
+                        <div class="col-lg-1"></div>
+                        <input type="reset" value="Annuler" class="pull-right btn btn-default"/>
+
+                        <input type="submit" value="Enregistrer" class="pull-right btn btn-warning"/>
+                        <input type="hidden" name="strCategoriePlaces" id="strCategoriePlaces" />
+
+                    </div>
+
+                </form>
+            </div>
+
+
+            <!-- Le Bouton Catégorie  -->
+            <div>
+                <input type="submit" value="Créer Catégorie" id="bouton_cat" class="btn btn-primary bouton_cat"/>
+            </div>
+
+            <!--  Le Bouton Créer Commercial -->
+            <div>
+                <input type="submit" value="Créer Commercial" id="bouton_com" class="btn btn-success bouton_com"/>
+            </div>
+
+            <!-- Formulaire Complet-->
+            <div>
+                <input type="submit" value="Formulaire Complet" id="btn_form_complet" class="btn btn-danger btn_form_complet"/>
+            </div>
+
+            <!--  Formulaire pour enregistrer une catégorie -->
+            <div>
+                <!-- action="{  path('oc_platform_categorie') }}" -->
+                <div id="categorie">
+                    <form  method="POST" id="enreg_cat">
+                        <br/>
+                        <div class="row">
+                            <div class="form-group">
+                                <label class="col-lg-4"> Nom de la Catégorie </label>
+                                <div class="col-lg-4">
+                                    <input type="text" class="form-control"  required name="nomc" id="nomcatego" autocomplete="off" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <br/>
+
+                        <div class="row">
+                            <div class="form-group">
+                                <input type="submit" class="btn btn-primary" value="Enregistrer" />
+                                <input type="reset" class="btn btn-warning"  value="Annuler" />
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+
+            <!--  Formulaire Commercial -->
+            <div id="commercial">
+                <form method="post" id="enreg_com">
+                    <br/>
+
+                <div class="row">
+                    <div class="form-group">
+                        <label class="col-lg-3"> Nom </label>
+                        <div class="col-lg-4">
+                            <input type="text" name="nomcom" required id="nomcom"  class="form-control" autocomplete="off" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="form-group">
+                        <label class="col-lg-3"> Prénom </label>
+                        <div class="col-lg-4">
+                            <input type="text" autocomplete="off" class="form-control" required id="prenomcom" name="prenomcom"/>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="form-group">
+                            <input type="submit" value="Enregistrer" class="btn btn-success"/>
+                            <input type="reset" value="Annuler"  class="btn btn-warning"/>
+                    </div>
+                </div>
+                </form>
+            </div>
+
+
+            <!-- Formulaire Complet  -->
+            <div id="form_complet" class="form-inline">
+                <form method="post" id="enreg_commercial" action="{{ path('oc_platform_formulaireComplet') }}" >
+                    <!-- Events "-->
+                    <div class="row">
+                        <div class="form-group col-lg-2">
+                            <label class="tite"> EVENTS </label><br/>
+                            <input type="checkbox" value="Entree" name="event" class="events" />
+                            <label> Entrée </label><br/>
+                            <input type="checkbox" value="Sortie" name="event" class="events" />
+                            <label> Sortie </label>
+                        </div>
+
+                    <!-- Zone -->
+                        <div class="form-group col-lg-3">
+                            <label class="tite"> ZONE </label><br/>
+                                {% for valeur, zone in listeZones %}
+                                    <input type="checkbox" value="{{ zone.id }}"  id="listeZones" name="zone" onfocus="limiteZone('{{ zone.id }}');"/>
+                                    <label> {{ zone.nom }} </label><br/>
+                                {% endfor %}
+                        </div>
+
+                        <!-- Commercial    -->
+                        <div class="row">
+                            <div class="form-group col-lg-3">
+                                <label class="tite"> COMMERCIAL </label><br/>
+                                     {%  for valeur, commercial in listeCommercial %}
+                                        <input type="checkbox" value="{{ commercial.id }}" id="listeCommercial" name="commercial" />
+                                        <label> {{ commercial.nom }} &nbsp; {{ commercial.prenom }}</label><br/>
+                                    {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- onfocus="markeurCommercial();" -->
+
+                        <!-- Périodes -->
+                       <!-- <div class="form-group col-lg-4">
+                            <label class="tite"> PERIODE </label><br/>
+                            <div class="row">
+                                <label class="col-lg-3"> Année </label>
+                                <div class="col-lg-1">
+                                    <input class="form-control" type="date" name="annee"/>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <label class="col-lg-3"> Week </label>
+                                <div class="col-lg-1">
+                                    <input type="week" class="form-control" name="week"/>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <label  class="col-lg-3"> Mois </label>
+                                <div class="col-lg-1">
+                                    <input type="month" class="form-control" name="mois"/>
+                                </div>
+                            </div>
+
+
+                            <div class="row">
+                                <label  class="col-lg-3"> Heure </label>
+                                <div class="col-lg-1">
+                                    <input type="datetime-local" class="form-control" name="heure"/>
+                                </div>
+                            </div>
+                            <br/>
+                        </div> -->
+
+                        <div class="row">
+                                <input type="submit" value="Valider" class="btn btn-success"/>
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+
+	</body>
+
+</html>
